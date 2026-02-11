@@ -7,7 +7,7 @@ app = Flask(__name__)
 # DATA FOR SATYAM KUMAR:
 # Update these lists to change the content of your portfolio!
 PROFICIENCY = [
-    {"name": "Python", "stars": 2},
+    {"name": "Pythonn", "stars": 2},
     {"name": "VibeCoding", "stars": 5}
 ]
 
@@ -55,3 +55,4 @@ def favicon():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
