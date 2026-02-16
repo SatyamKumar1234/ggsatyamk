@@ -6,14 +6,12 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Portfolio</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,700&amp;display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,700&display=swap"
         rel="stylesheet" />
     <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         rel="stylesheet" />
-    <!-- FAVICON INSTRUCTION: Place 'favicon.ico' in 'static' folder and uncomment the line below -->
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
     <script src="https://kit.fontawesome.com/f26f250140.js" crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
@@ -47,15 +45,12 @@
             pointer-events: none;
             z-index: 0;
             opacity: 1;
-            /* Default visible */
-            /* THIS IS THE FIX: Smoothly transition opacity changes over 2 seconds */
             transition: opacity 2s ease-in-out;
         }
 
         .snowflake {
             position: absolute;
             border-radius: 50%;
-            /* Start slightly off-screen to prevent visual clustering */
             top: -20px;
             animation: fall linear infinite, blink ease-in-out infinite alternate;
         }
@@ -72,7 +67,6 @@
             0% {
                 transform: translateY(-10vh) translateX(0);
             }
-
             100% {
                 transform: translateY(110vh) translateX(35px);
             }
@@ -82,11 +76,9 @@
             0% {
                 opacity: 0.1;
             }
-
             50% {
                 opacity: 0.6;
             }
-
             100% {
                 opacity: 0.1;
             }
@@ -109,26 +101,23 @@
 
 <body class="font-display bg-background-dark text-white selection:bg-white selection:text-black">
 
-    <!-- Snow Container -->
     <div class="snow-container" id="snow"></div>
 
-    <!-- Snow Toggle Button (Top Left) -->
     <button id="snow-toggle"
         class="absolute top-10 left-8 z-50 text-white hover:scale-110 transition-all cursor-pointer flex items-center justify-center p-0 bg-transparent border-none outline-none"
         aria-label="Toggle Snow">
-        <!-- Using Material Symbols 'ac_unit' - Simple and clean -->
         <span id="toggle-icon" class="material-symbols-outlined text-4xl">
             ac_unit
         </span>
     </button>
 
-
-
     <div class="relative z-10 min-h-screen flex flex-col items-center">
         <header class="w-full max-w-none px-4 py-10 flex justify-end items-center lg:pr-12">
-            <nav>
+            <nav class="flex gap-8">
                 <a class="text-xs font-medium tracking-[0.3em] uppercase hover:text-gray-400 transition-colors"
                     href="{{ photography_link }}">Photography</a>
+                <a class="text-xs font-medium tracking-[0.3em] uppercase hover:text-gray-400 transition-colors"
+                    href="/alternative">Altdesign</a>
             </nav>
         </header>
         <main class="w-full max-w-6xl px-8 flex-grow">
@@ -143,12 +132,10 @@
                 </div>
             </section>
 
-            <!-- INTRODUCTION SECTION -->
             <section class="py-24 border-t border-white/10">
                 <div class="max-w-3xl">
                     <h2 class="text-xs uppercase tracking-[0.3em] text-gray-500 mb-8">Introduction</h2>
                     <div class="text-2xl md:text-3xl font-light text-gray-300 leading-relaxed">
-                        <!-- Write your introduction here! -->
                         <p>Welcome to my portfolio! I am a passionate Student and Developer dedicated to building
                             elegant digital experiences. I specialize in backend development and enjoy exploring the
                             intersection of design and technology.</p>
@@ -166,7 +153,7 @@
                             skill.name }}</span>
                         <div class="flex gap-1 text-white">
                             {% for i in range(5) %}
-                            {% if i < skill.stars %} <span class="material-symbols-outlined fill-[1] text-lg">
+                            {% if i < skill.stars %} <span class="material-symbols-outlined fill-1 text-lg">
                                 star</span>
                                 {% else %}
                                 <span class="material-symbols-outlined text-lg opacity-20">star</span>
@@ -223,22 +210,16 @@
         toggleBtn.addEventListener('click', () => {
             isSnowing = !isSnowing;
             if (isSnowing) {
-                // When on, white and full visibility
                 snowContainer.style.opacity = '1';
                 toggleBtn.style.color = 'white';
                 toggleBtn.style.opacity = '1';
             } else {
-                // When off, gray and slightly dimmed
                 snowContainer.style.opacity = '0';
-                toggleBtn.style.color = '#6b7280'; // text-gray-500
+                toggleBtn.style.color = '#6b7280';
                 toggleBtn.style.opacity = '0.7';
             }
-
-
-
         });
 
-        // Generate Snow Logic (same as before)
         const count = 180;
         for (let i = 0; i < count; i++) {
             const snowflake = document.createElement('div');
@@ -252,7 +233,6 @@
             snowflake.style.left = `${Math.random() * 100}%`;
 
             const duration = Math.random() * 15 + 10;
-            // Negative delay logic to prevent top clustering on load
             const startDelay = Math.random() * duration;
 
             snowflake.style.animationDuration = `${duration}s, ${Math.random() * 3 + 2}s`;
@@ -266,12 +246,7 @@
             }
             snowContainer.appendChild(snowflake);
         }
-    </script><!-- Vibe Switch Button -->
-<a href="{{ url_for('alternative') }}" class="fixed bottom-8 right-8 z-50 bg-white text-black px-6 py-3 rounded-full font-medium text-sm shadow-lg hover:scale-110 transition-transform flex items-center gap-2">
-    <span class="material-symbols-outlined text-lg">wb_sunny</span>
-    <span>Storybook Vibe</span>
-</a>
+    </script>
 </body>
-
 
 </html>
