@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{{ hero.name }} | Storybook Journey</title>
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/f26f250140.js" crossorigin="anonymous"></script>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#D4A574",
+                        "paper": "#F2EFE9",
+                        "ink": "#2C2420",
+                        "hill-front": "#7A9B8A",
+                        "hill-mid": "#6B8B7B",
+                        "hill-back": "#5C7B6B",
+                        "wood": "#8B5A2B",
+                        "bark": "#5D3A1A",
+                        "gold": "#C9A961",
+                    },
+                    fontFamily: {
+                        "display": ["Newsreader", "serif"],
+                        "hand": ["Caveat", "cursive"],
+                        "modern": ["Space Grotesk", "sans-serif"],
+                    },
+                    boxShadow: {
+                        "paper": "4px 4px 0px rgba(44, 36, 32, 0.15)",
+                        "paper-lg": "8px 8px 0px rgba(44, 36, 32, 0.15)",
+                        "pressed": "inset 2px 2px 4px rgba(0,0,0,0.2), inset -1px -1px 2px rgba(255,255,255,0.1)",
+                    }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        /* Subtle Grain */
+        .bg-grain::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 50; opacity: 0.15;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .cut-edge-bottom {
+            clip-path: polygon(0% 0%, 100% 0%, 100% 90%, 95% 100%, 90% 92%, 85% 100%, 80% 95%, 75% 100%, 70% 92%, 65% 100%, 60% 95%, 55% 100%, 50% 92%, 45% 100%, 40% 95%, 35% 100%, 30% 92%, 25% 100%, 20% 95%, 15% 100%, 10% 92%, 5% 100%, 0% 90%);
+        }
+
+        .perspective-1000 { perspective: 1000px; }
+
+        /* Modern Nav */
+        .nav-link {
+            position: relative;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            inset: -8px -16px;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 8px;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+        
+        .nav-link:hover::before {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: currentColor;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .nav-link:hover {
+            letter-spacing: 0.05em;
+        }
+
+        /* Button Float & Pressed States */
+        @keyframes float-gentle {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .btn-float {
+            animation: float-gentle 3s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+        .btn-float:hover {
+            animation-play-state: paused;
+            box-shadow: 6px 6px 0px rgba(44, 36, 32, 0.2);
+        }
+        .btn-float:active {
+            box-shadow: var(--tw-shadow-pressed);
+            transform: translateY(2px);
+        }
+
+        /* Tree Sway */
+        @keyframes sway-left {
+            0%, 100% { transform: rotate(-1deg); }
+            50% { transform: rotate(1deg); }
+        }
+        @keyframes sway-right {
+            0%, 100% { transform: scaleX(-1) rotate(-1deg); }
+            50% { transform: scaleX(-1) rotate(1deg); }
+        }
+        .tree-left {
+            animation: sway-left 8s ease-in-out infinite;
+            transform-origin: bottom center;
+            will-change: transform;
+        }
+        .tree-right {
+            animation: sway-right 10s ease-in-out infinite;
+            transform-origin: bottom center;
+            will-change: transform;
+        }
+
+        /* Parallax Trees */
+        .parallax-tree {
+            transition: transform 0.1s linear;
+            will-change: transform;
+        }
+
+        /* Bookmark Progress */
+        .bookmark-progress {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 0%;
+            background: linear-gradient(to bottom, #D4A574, #8B5A2B);
+            z-index: 100;
+            transition: height 0.1s linear;
+            box-shadow: 2px 0 8px rgba(139, 90, 43, 0.3);
+        }
+
+        /* Time-based themes */
+        .theme-morning { --flower-brightness: 1.1; --shadow-opacity: 0.15; }
+        .theme-day { --flower-brightness: 1; --shadow-opacity: 0.2; }
+        .theme-evening { --flower-brightness: 0.9; --shadow-opacity: 0.25; }
+        .theme-night { --flower-brightness: 0.7; --shadow-opacity: 0.3; }
+
+        /* Card Hover Effects */
+        .project-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .project-card:hover {
+            transform: translateY(-16px) rotate(1deg);
+        }
+        .project-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(212, 165, 116, 0.15), transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        .tooltip::after {
+            content: 'Copied!';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: #2C2420;
+            color: #F2EFE9;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .tooltip.show::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-4px);
+        }
+
+        /* Glassmorphism for text readability */
+        .glass-text {
+            background: rgba(242, 239, 233, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 24px;
+            padding: 3rem;
+        }
+
+        /* Star Rating */
+        .star-filled { color: #D4A574; }
+        .star-empty { color: #D4A574; opacity: 0.2; }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .tree-right { display: none; }
+            .tree-left { width: 80vw; left: -20vw; }
+            .glass-text { padding: 1.5rem; backdrop-filter: blur(4px); }
+        }
+
+        /* Vibe Switch Button */
+        .vibe-switch {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 90;
+            background: #2C2420;
+            color: #F2EFE9;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .vibe-switch:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+    </style>
+</head>
+
+<body class="bg-paper text-ink font-display bg-grain selection:bg-primary/30 overflow-x-hidden theme-day">
+
+    <!-- Bookmark Progress Indicator -->
+    <div class="bookmark-progress" id="bookmark"></div>
+
+    <!-- Modern Top Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-[60] px-6 py-6 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <a href="{{ url_for('index') }}" class="nav-link font-modern text-xs sm:text-sm text-ink px-3 sm:px-4 py-2 flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-full">
+                <span class="material-symbols-outlined text-lg">dark_mode</span>
+                <span class="hidden sm:inline">Back to Dark Mode</span>
+                <span class="sm:hidden">Dark</span>
+            </a>
+        </div>
+        <div class="flex items-center gap-1 sm:gap-2">
+            <a href="{{ photography_link }}" class="nav-link font-modern text-xs sm:text-sm text-ink px-3 sm:px-4 py-2 flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-hill-mid"></span>
+                Photography
+            </a>
+        </div>
+    </nav>
+
+    <!-- SECTION 1: HERO -->
+    <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <!-- Parallax Background with Trees -->
+        <div class="absolute inset-0 z-0" id="tree-container">
+            <!-- Left Tree -->
+            <svg class="tree-left parallax-tree absolute bottom-[5vh] left-[-10vw] w-[60vw] h-[90vh]" data-speed="0.3" viewBox="0 0 400 600" preserveAspectRatio="xMidYMax meet">
+                <defs>
+                    <linearGradient id="trunkGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#4A3728;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#6B4423;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#3D2B1F;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="flower1" cx="30%" cy="30%">
+                        <stop offset="0%" style="stop-color:#FFB7C5;stop-opacity:0.9" />
+                        <stop offset="70%" style="stop-color:#FF91A4;stop-opacity:0.8" />
+                        <stop offset="100%" style="stop-color:#E6687A;stop-opacity:0.6" />
+                    </radialGradient>
+                </defs>
+                
+                <path d="M200 600 Q 180 500 190 400 Q 170 300 185 200 Q 195 150 200 100" 
+                      fill="none" stroke="url(#trunkGrad1)" stroke-width="25" stroke-linecap="round"/>
+                <path d="M190 400 Q 140 350 100 320 Q 70 300 50 280" fill="none" stroke="#5D3A1A" stroke-width="12" stroke-linecap="round"/>
+                <path d="M185 300 Q 130 260 90 240 Q 60 225 40 210" fill="none" stroke="#5D3A1A" stroke-width="10" stroke-linecap="round"/>
+                <path d="M185 220 Q 140 180 110 160 Q 85 145 70 130" fill="none" stroke="#5D3A1A" stroke-width="8" stroke-linecap="round"/>
+                <path d="M190 380 Q 250 340 290 310 Q 320 290 340 270" fill="none" stroke="#5D3A1A" stroke-width="11" stroke-linecap="round"/>
+                <path d="M188 280 Q 240 240 280 210 Q 310 190 330 170" fill="none" stroke="#5D3A1A" stroke-width="9" stroke-linecap="round"/>
+                <path d="M192 180 Q 230 150 260 130 Q 285 115 300 100" fill="none" stroke="#5D3A1A" stroke-width="7" stroke-linecap="round"/>
+                <path d="M100 320 Q 80 290 70 260" fill="none" stroke="#4A3728" stroke-width="5" stroke-linecap="round"/>
+                <path d="M290 310 Q 310 280 320 250" fill="none" stroke="#4A3728" stroke-width="5" stroke-linecap="round"/>
+                
+                <circle cx="50" cy="260" r="35" fill="url(#flower1)" opacity="0.6" class="flower-cluster"/>
+                <circle cx="330" cy="250" r="40" fill="url(#flower1)" opacity="0.6" class="flower-cluster"/>
+                <circle cx="70" cy="160" r="30" fill="url(#flower1)" opacity="0.6" class="flower-cluster"/>
+                <circle cx="310" cy="120" r="35" fill="url(#flower1)" opacity="0.6" class="flower-cluster"/>
+                <circle cx="90" cy="220" r="45" fill="url(#flower1)" opacity="0.75" class="flower-cluster"/>
+                <circle cx="300" cy="190" r="42" fill="url(#flower1)" opacity="0.75" class="flower-cluster"/>
+                <circle cx="120" cy="130" r="38" fill="url(#flower1)" opacity="0.75" class="flower-cluster"/>
+                <circle cx="280" cy="280" r="40" fill="url(#flower1)" opacity="0.75" class="flower-cluster"/>
+                <circle cx="200" cy="80" r="50" fill="url(#flower1)" opacity="0.9" class="flower-cluster"/>
+                <circle cx="140" cy="100" r="45" fill="url(#flower1)" opacity="0.85" class="flower-cluster"/>
+                <circle cx="260" cy="90" r="48" fill="url(#flower1)" opacity="0.85" class="flower-cluster"/>
+                <circle cx="200" cy="150" r="55" fill="url(#flower1)" opacity="0.9" class="flower-cluster"/>
+                <circle cx="110" cy="290" r="42" fill="url(#flower1)" opacity="0.8" class="flower-cluster"/>
+                <circle cx="290" cy="300" r="45" fill="url(#flower1)" opacity="0.8" class="flower-cluster"/>
+                <circle cx="160" cy="70" r="15" fill="#FFD1DC" opacity="0.7"/>
+                <circle cx="240" cy="60" r="18" fill="#FFD1DC" opacity="0.7"/>
+                <circle cx="200" cy="40" r="20" fill="#FFD1DC" opacity="0.6"/>
+                <circle cx="80" cy="200" r="16" fill="#FFD1DC" opacity="0.7"/>
+                <circle cx="320" cy="160" r="17" fill="#FFD1DC" opacity="0.7"/>
+            </svg>
+
+            <!-- Right Tree -->
+            <svg class="tree-right parallax-tree absolute bottom-[3vh] right-[-15vw] w-[70vw] h-[95vh]" data-speed="0.5" viewBox="0 0 400 600" preserveAspectRatio="xMidYMax meet">
+                <defs>
+                    <linearGradient id="trunkGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#3D2B1F;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#6B4423;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#4A3728;stop-opacity:1" />
+                    </linearGradient>
+                    <radialGradient id="flower2" cx="30%" cy="30%">
+                        <stop offset="0%" style="stop-color:#FFC4D1;stop-opacity:0.9" />
+                        <stop offset="60%" style="stop-color:#FF9AAE;stop-opacity:0.8" />
+                        <stop offset="100%" style="stop-color:#E85D75;stop-opacity:0.6" />
+                    </radialGradient>
+                </defs>
+                
+                <path d="M200 600 Q 220 480 210 380 Q 230 280 215 180 Q 205 120 200 80" 
+                      fill="none" stroke="url(#trunkGrad2)" stroke-width="28" stroke-linecap="round"/>
+                <path d="M210 380 Q 150 330 110 290 Q 75 260 50 230" fill="none" stroke="#5D3A1A" stroke-width="13" stroke-linecap="round"/>
+                <path d="M215 280 Q 160 230 120 200 Q 90 175 65 150" fill="none" stroke="#5D3A1A" stroke-width="11" stroke-linecap="round"/>
+                <path d="M212 190 Q 170 150 135 120 Q 105 95 85 70" fill="none" stroke="#5D3A1A" stroke-width="9" stroke-linecap="round"/>
+                <path d="M208 360 Q 270 320 310 280 Q 340 250 360 220" fill="none" stroke="#5D3A1A" stroke-width="12" stroke-linecap="round"/>
+                <path d="M213 260 Q 260 220 300 190 Q 330 165 350 140" fill="none" stroke="#5D3A1A" stroke-width="10" stroke-linecap="round"/>
+                <path d="M210 170 Q 250 140 280 115 Q 305 95 320 75" fill="none" stroke="#5D3A1A" stroke-width="8" stroke-linecap="round"/>
+                <path d="M110 290 Q 90 250 80 210" fill="none" stroke="#4A3728" stroke-width="6" stroke-linecap="round"/>
+                <path d="M310 280 Q 330 240 345 200" fill="none" stroke="#4A3728" stroke-width="6" stroke-linecap="round"/>
+                
+                <circle cx="40" cy="210" r="38" fill="url(#flower2)" opacity="0.6" class="flower-cluster"/>
+                <circle cx="350" cy="200" r="42" fill="url(#flower2)" opacity="0.6" class="flower-cluster"/>
+                <circle cx="60" cy="100" r="32" fill="url(#flower2)" opacity="0.6" class="flower-cluster"/>
+                <circle cx="330" cy="80" r="36" fill="url(#flower2)" opacity="0.6" class="flower-cluster"/>
+                <circle cx="160" cy="50" r="30" fill="url(#flower2)" opacity="0.6" class="flower-cluster"/>
+                <circle cx="100" cy="170" r="48" fill="url(#flower2)" opacity="0.75" class="flower-cluster"/>
+                <circle cx="320" cy="150" r="45" fill="url(#flower2)" opacity="0.75" class="flower-cluster"/>
+                <circle cx="130" cy="70" r="42" fill="url(#flower2)" opacity="0.75" class="flower-cluster"/>
+                <circle cx="290" cy="250" r="44" fill="url(#flower2)" opacity="0.75" class="flower-cluster"/>
+                <circle cx="200" cy="40" r="40" fill="url(#flower2)" opacity="0.75" class="flower-cluster"/>
+                <circle cx="200" cy="60" r="55" fill="url(#flower2)" opacity="0.9" class="flower-cluster"/>
+                <circle cx="150" cy="100" r="48" fill="url(#flower2)" opacity="0.85" class="flower-cluster"/>
+                <circle cx="260" cy="90" r="50" fill="url(#flower2)" opacity="0.85" class="flower-cluster"/>
+                <circle cx="200" cy="130" r="58" fill="url(#flower2)" opacity="0.9" class="flower-cluster"/>
+                <circle cx="90" cy="240" r="46" fill="url(#flower2)" opacity="0.8" class="flower-cluster"/>
+                <circle cx="310" cy="230" r="48" fill="url(#flower2)" opacity="0.8" class="flower-cluster"/>
+                <circle cx="180" cy="180" r="52" fill="url(#flower2)" opacity="0.85" class="flower-cluster"/>
+                <circle cx="120" cy="45" r="18" fill="#FFE4E9" opacity="0.7"/>
+                <circle cx="280" cy="50" r="20" fill="#FFE4E9" opacity="0.7"/>
+                <circle cx="200" cy="20" r="22" fill="#FFE4E9" opacity="0.6"/>
+                <circle cx="70" cy="140" r="17" fill="#FFE4E9" opacity="0.7"/>
+                <circle cx="340" cy="120" r="19" fill="#FFE4E9" opacity="0.7"/>
+                <circle cx="240" cy="160" r="16" fill="#FFE4E9" opacity="0.7"/>
+            </svg>
+        </div>
+
+        <!-- Hero Content with Glassmorphism -->
+        <div class="container mx-auto px-6 relative z-20 flex flex-col items-center justify-center text-center min-h-[60vh]">
+            <div class="glass-text max-w-3xl">
+                <h1 class="text-5xl sm:text-6xl md:text-8xl font-bold leading-tight mb-6">
+                    <span class="font-light">Curating</span> <br/> 
+                    <span class="italic text-hill-mid">Digital</span> 
+                    <span class="font-bold">Journeys.</span>
+                </h1>
+                <p class="text-lg sm:text-xl md:text-2xl text-ink/70 max-w-lg mx-auto mb-4 leading-relaxed">
+                    I'm {{ hero.name }}, a {{ hero.tagline.lower() }} who believes websites should feel as tactile and intentional as a well-worn book.
+                </p>
+                <div class="flex items-center justify-center gap-2 text-ink/50 mb-8">
+                    <span class="material-symbols-outlined text-xl">location_on</span>
+                    <span class="font-modern text-sm tracking-wide">{{ hero.location }}</span>
+                </div>
+            </div>
+            
+            <div class="mt-12">
+                <a href="#projects" class="btn-float bg-wood text-paper px-10 py-5 rounded shadow-paper-lg border-2 border-wood/30 font-bold flex items-center gap-3 text-base md:text-lg tracking-wide font-modern">
+                    <span>{{ hero.cta_text }}</span>
+                    <span class="material-symbols-outlined text-xl">{{ hero.cta_icon }}</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Rolling Hills -->
+        <div class="absolute bottom-0 w-full overflow-hidden leading-none z-10">
+            <svg class="relative block w-[200%] h-24 sm:h-32 md:h-48 text-hill-front fill-current translate-x-[-10%]" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,0 C300,120 900,120 1200,0 L1200,120 L0,120 Z"></path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- SECTION 2: THE CRAFT / INTRO -->
+    <section id="about" class="bg-hill-front py-24 sm:py-32 relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+                <div class="w-full lg:w-1/2">
+                    <div class="bg-paper p-8 md:p-12 rounded shadow-paper-lg -rotate-1 hover:rotate-0 transition-transform duration-500">
+                        <h2 class="font-hand text-4xl text-primary mb-8">{{ craft.headline }}</h2>
+                        <p class="text-xl mb-10 leading-relaxed text-ink/80">
+                            {{ craft.description }}
+                        </p>
+                        
+                        <!-- Proficiency/Skills from your data -->
+                        <div class="border-t border-ink/10 pt-8 mb-8">
+                            <h3 class="font-modern text-xs uppercase tracking-[0.2em] text-ink/50 mb-6">Proficiency</h3>
+                            <div class="space-y-4">
+                                {% for skill in proficiency %}
+                                <div class="flex justify-between items-center group">
+                                    <span class="font-bold font-modern text-sm tracking-wide text-ink group-hover:text-primary transition-colors">{{ skill.name }}</span>
+                                    <div class="flex gap-1">
+                                        {% for i in range(5) %}
+                                            {% if i < skill.stars %}
+                                            <span class="material-symbols-outlined text-lg star-filled fill-1">star</span>
+                                            {% else %}
+                                            <span class="material-symbols-outlined text-lg star-empty">star</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            {% for skill in craft.skills %}
+                            <div class="flex items-center gap-3 group cursor-default bg-white/50 p-3 rounded-lg hover:bg-white transition-colors">
+                                <span class="material-symbols-outlined text-primary text-xl group-hover:scale-110 transition-transform">{{ skill.icon }}</span>
+                                <span class="font-bold font-modern text-sm tracking-wide">{{ skill.name }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full lg:w-1/2 text-paper mt-12 lg:mt-0">
+                    <h3 class="text-4xl sm:text-5xl font-bold mb-8 leading-tight">{{ craft.specialty_title }}</h3>
+                    <div class="text-lg sm:text-xl opacity-90 mb-8 leading-relaxed space-y-4">
+                        <p>{{ hero.intro }}</p>
+                        <p>{{ craft.specialty_desc }}</p>
+                    </div>
+                    <div class="h-1 w-24 bg-primary mb-8"></div>
+                    <blockquote class="font-hand text-3xl sm:text-4xl italic leading-relaxed">
+                        "{{ craft.quote }}"
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: THE GALLERY / PROJECTS -->
+    <section id="projects" class="py-24 sm:py-32 bg-paper relative z-20 cut-edge-bottom">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-20">
+                <span class="font-modern text-xs uppercase tracking-[0.3em] text-ink/50 mb-4 block">Selected Works</span>
+                <h2 class="text-5xl sm:text-6xl md:text-7xl font-bold">Featured Works</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 sm:gap-14">
+                {% for project in projects %}
+                <a href="{{ project.link }}" target="_blank" class="group perspective-1000 relative block">
+                    <div class="project-card bg-white p-5 shadow-paper hover:shadow-paper-lg border-2 border-ink/5 h-full flex flex-col relative overflow-hidden cursor-pointer">
+                        <div class="aspect-video bg-hill-back mb-6 overflow-hidden relative rounded-sm">
+                            <img src="{{ project.image }}" alt="{{ project.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="absolute bottom-4 left-4 text-white opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                                <span class="material-symbols-outlined text-2xl">arrow_outward</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-modern uppercase tracking-widest text-ink/50">{{ project.category }} — {{ project.year }}</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 font-display">{{ project.title }}</h3>
+                        <p class="text-ink/60 mb-6 text-base leading-relaxed flex-grow">{{ project.description }}</p>
+                        <div class="flex gap-3 flex-wrap">
+                            {% for tech in project.tech %}
+                            <span class="text-xs font-modern font-semibold bg-primary/10 text-ink/70 px-3 py-1.5 rounded-full">{{ tech }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: CONTACT -->
+    <footer id="contact" class="bg-ink text-paper py-24 sm:py-32 mt-[-5vh] pt-[15vh] relative">
+        <div class="container mx-auto px-6 text-center">
+            
+            <a href="mailto:{{ contact.email }}" id="email-link" class="tooltip inline-block border-2 border-primary text-primary hover:bg-primary hover:text-ink transition-all px-10 sm:px-14 py-5 sm:py-6 text-xl sm:text-2xl font-bold rounded-full mb-16 font-modern tracking-wide">
+                {{ contact.email }}
+            </a>
+
+            <div class="flex justify-center gap-8 sm:gap-10 opacity-60 mb-16">
+                {% if social_links.instagram %}
+                <a href="{{ social_links.instagram }}" target="_blank" class="hover:opacity-100 transition-all transform hover:scale-110 hover:-translate-y-1" aria-label="Instagram">
+                    <i class="fa-brands fa-instagram text-3xl sm:text-4xl"></i>
+                </a>
+                {% endif %}
+                {% if social_links.github %}
+                <a href="{{ social_links.github }}" target="_blank" class="hover:opacity-100 transition-all transform hover:scale-110 hover:-translate-y-1" aria-label="GitHub">
+                    <i class="fa-brands fa-github text-3xl sm:text-4xl"></i>
+                </a>
+                {% endif %}
+                {% if social_links.twitter %}
+                <a href="{{ social_links.twitter }}" target="_blank" class="hover:opacity-100 transition-all transform hover:scale-110 hover:-translate-y-1" aria-label="Twitter">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8 fill-current" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+                {% endif %}
+                {% if social_links.linkedin %}
+                <a href="{{ social_links.linkedin }}" target="_blank" class="hover:opacity-100 transition-all transform hover:scale-110 hover:-translate-y-1" aria-label="LinkedIn">
+                    <svg class="w-7 h-7 sm:w-8 sm:h-8 fill-current" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="mt-16 pt-10 border-t border-paper/10 text-sm text-paper/30 font-modern tracking-wide">
+                &copy; 2024 {{ hero.name.replace(' ', '') }} Journey. {{ contact.footer_text }}
+            </div>
+        </div>
+    </footer>
+
+    <!-- Vibe Switch Button -->
+    <a href="{{ url_for('index') }}" class="vibe-switch">
+        <span class="material-symbols-outlined">dark_mode</span>
+        <span>Switch to Dark Vibe</span>
+    </a>
+
+    <script>
+        // Time-based theme
+        function setTimeTheme() {
+            const hour = new Date().getHours();
+            const body = document.body;
+            body.classList.remove('theme-morning', 'theme-day', 'theme-evening', 'theme-night');
+            
+            if (hour >= 5 && hour < 12) body.classList.add('theme-morning');
+            else if (hour >= 12 && hour < 17) body.classList.add('theme-day');
+            else if (hour >= 17 && hour < 21) body.classList.add('theme-evening');
+            else body.classList.add('theme-night');
+        }
+        setTimeTheme();
+
+        // Bookmark Progress
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            document.getElementById('bookmark').style.height = scrollPercent + '%';
+        });
+
+        // Parallax Trees
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.querySelectorAll('.parallax-tree').forEach(tree => {
+                const speed = parseFloat(tree.dataset.speed) || 0.3;
+                const yPos = -(scrolled * speed);
+                const currentTransform = tree.classList.contains('tree-right') ? 'scaleX(-1)' : '';
+                tree.style.transform = `${currentTransform} translateY(${yPos}px)`;
+            });
+        });
+
+        // Project Card Spotlight Effect
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--mouse-x', `${x}%`);
+                card.style.setProperty('--mouse-y', `${y}%`);
+            });
+        });
+
+        // Email Copy to Clipboard
+        document.getElementById('email-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            const email = this.getAttribute('href').replace('mailto:', '');
+            navigator.clipboard.writeText(email).then(() => {
+                this.classList.add('show');
+                setTimeout(() => this.classList.remove('show'), 2000);
+            });
+        });
+
+        // Smooth reveal animation
+        const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section > div').forEach(el => {
+            el.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
