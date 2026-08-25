@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # DATA
 PROFICIENCY = [
-    {"name": "Python", "stars": 2}
+    {"name": "Python", "stars": 3.5}
     
 ]
 
